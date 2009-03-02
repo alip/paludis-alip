@@ -104,6 +104,16 @@ namespace
         if (-1 == result)
             throw SafeIFStreamError("Could not open '" + stringify(e) + "': " + strerror(errno));
 
+        struct stat sb;
+        if (-1 == fstat(result, &sb)) {
+            close(result);
+            throw SafeIFStreamError("Could not stat '" + stringify(e) + "': " + strerror(errno));
+        }
+        if (0 != S_ISDIR(sb.st_mode)) {
+            close(result);
+            throw SafeIFStreamError("'" + stringify(e) + "' is a directory");
+        }
+
         return result;
     }
 }
