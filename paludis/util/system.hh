@@ -404,5 +404,8 @@ namespace paludis
     std::string get_group_name(const gid_t) PALUDIS_VISIBLE;
 }
 
+#ifndef HAVE_DECL_ENVIRON
+    extern char **environ;
+#endif
 #endif
 

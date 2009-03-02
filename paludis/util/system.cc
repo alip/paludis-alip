@@ -453,7 +453,11 @@ namespace
                      "LD_LIBRARY_PATH=" == var.substr(0, 16)))
                     setenvs.insert(std::make_pair(var.substr(0, var.find('=')), var.substr(var.find('=') + 1)));
             }
+#ifdef HAVE_CLEARENV
             clearenv();
+#else
+            environ = NULL;
+#endif
             for (std::map<std::string, std::string>::const_iterator it(setenvs.begin()),
                      it_end(setenvs.end()); it_end != it; ++it)
                 setenv(it->first.c_str(), it->second.c_str(), 1);

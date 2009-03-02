@@ -151,6 +151,11 @@ dnl {{{ check for utimensat
 AC_CHECK_FUNCS([utimensat])
 dnl }}}
 
+dnl {{{ check for environ and clearenv
+AC_CHECK_DECLS([environ])
+AC_CHECK_FUNCS([clearenv])
+dnl }}}
+
 dnl {{{ check for listxattrf etc
 AC_MSG_CHECKING([for f*xattr function family])
 AC_COMPILE_IFELSE([
