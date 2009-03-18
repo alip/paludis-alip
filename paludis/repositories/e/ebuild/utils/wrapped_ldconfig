@@ -2,6 +2,7 @@
 
 case $(uname -s) in
     FreeBSD)
+    [[ -d "$1"/var/run ]] || exit 0
     ldconfig -elf -i -f "$1"/var/run/ld-elf.so.hints "$1"/etc/ld.so.conf
     exit $?
     ;;
