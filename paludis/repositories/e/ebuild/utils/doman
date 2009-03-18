@@ -61,7 +61,7 @@ for x in "$@"; do
         mandir=${i18n}man${suffix:0:1}
     fi
 
-    match='man[0-9n](|f|p|pm)$'
+    match='man[0-9n](f|p|pm)?$'
 
     if [[ ${mandir} =~ ${match} ]]; then
         if [[ -s ${x} ]]; then
