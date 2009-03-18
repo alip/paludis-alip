@@ -12,6 +12,17 @@ fix() {
     tr ' \t' '__' <<<"$1"
 }
 
+md5sum() {
+    if [[ -x "$(type -P md5sum 2>/dev/null)" ]] ; then
+        command md5sum "${@}"
+    elif [[ -x "$(type -P md5 2>/dev/null)" ]] ; then
+        command md5 -r "${@}"
+    else
+        echo "No md5sum workalike found" 1>&2
+        exit 4
+    fi
+}
+
 make_vdb() {
     mkdir -p "../repo/cat/$1-1234"
     for i in SLOT EAPI ; do
