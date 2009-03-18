@@ -148,7 +148,7 @@ EbuildCommand::operator() ()
     using namespace std::tr1::placeholders;
 
     cmd.with_pipe_command_handler("PALUDIS_PIPE_COMMAND", std::tr1::bind(&pipe_command_handler, params.environment(),
-                params.package_id(), _1, params.maybe_output_manager()));
+                params.package_id(), _1, params.maybe_output_manager()), params.builddir());
 
     std::tr1::shared_ptr<const FSEntrySequence> syncers_dirs(params.environment()->syncers_dirs());
     std::tr1::shared_ptr<const FSEntrySequence> bashrc_files(params.environment()->bashrc_files());
@@ -1001,7 +1001,7 @@ WriteVDBEntryCommand::operator() ()
             .with_setenv("PALUDIS_EBUILD_PHASE_VAR",
                     params.package_id()->eapi()->supported()->ebuild_environment_variables()->env_ebuild_phase())
             .with_pipe_command_handler("PALUDIS_PIPE_COMMAND", std::tr1::bind(&pipe_command_handler, params.environment(),
-                        params.package_id(), _1, params.maybe_output_manager()))
+                        params.package_id(), _1, params.maybe_output_manager()), params.output_directory())
             );
 
     if (! params.package_id()->eapi()->supported()->ebuild_metadata_variables()->iuse_effective()->name().empty())
@@ -1235,7 +1235,7 @@ WriteBinaryEbuildCommand::operator() ()
             .with_setenv("PALUDIS_EBUILD_PHASE_VAR",
                     params.package_id()->eapi()->supported()->ebuild_environment_variables()->env_ebuild_phase())
             .with_pipe_command_handler("PALUDIS_PIPE_COMMAND", std::tr1::bind(&pipe_command_handler, params.environment(),
-                        params.package_id(), _1, params.maybe_output_manager()))
+                        params.package_id(), _1, params.maybe_output_manager()), params.builddir())
             );
 
     if (0 != (run_command(cmd)))

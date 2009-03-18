@@ -26,14 +26,20 @@
 int
 main(int argc, char *argv[])
 {
-    if (argc != 3)
+    if (argc < 3 || argc > 4)
     {
-        std::cerr << "Usage: " << argv[0] << " write_fd read_fd" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " write_fd read_fd [lock_fd]" << std::endl;
         return EXIT_FAILURE;
     }
 
     int write_fd(std::atoi(argv[1])), read_fd(std::atoi(argv[2]));
-    if (0 != ::lockf(write_fd, F_LOCK, 0))
+    int lock_fd(write_fd);
+    if (argc == 4)
+    {
+        lock_fd = std::atoi(argv[3]);
+    }
+
+    if (0 != ::lockf(lock_fd, F_LOCK, 0))
     {
         std::cerr << "Error: " << argv[0] << ": lockf failed with " << ::strerror(errno) << std::endl;
         return EXIT_FAILURE;
@@ -110,7 +116,7 @@ main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    if (0 != ::lockf(write_fd, F_ULOCK, 0))
+    if (0 != ::lockf(lock_fd, F_ULOCK, 0))
     {
         std::cerr << "Error: " << argv[0] << ": lockf unlock failed with " << ::strerror(errno) << std::endl;
         return EXIT_FAILURE;

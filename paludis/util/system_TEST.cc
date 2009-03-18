@@ -202,9 +202,9 @@ namespace test_cases
         void run()
         {
             TEST_CHECK_EQUAL(run_command(Command("bash system_TEST_dir/pipe_test.bash ONE TWO")
-                        .with_pipe_command_handler("PALUDIS_PIPE_COMMAND", &response_handler)), 12);
+                        .with_pipe_command_handler("PALUDIS_PIPE_COMMAND", &response_handler, (FSEntry::cwd() / "system_TEST_dir"))), 12);
             TEST_CHECK_EQUAL(run_command(Command("bash system_TEST_dir/pipe_test.bash THREE FOUR")
-                        .with_pipe_command_handler("PALUDIS_PIPE_COMMAND", &response_handler)), 34);
+                        .with_pipe_command_handler("PALUDIS_PIPE_COMMAND", &response_handler, (FSEntry::cwd() / "system_TEST_dir"))), 34);
         }
     } test_pipe_command;
 
@@ -287,7 +287,7 @@ namespace test_cases
         {
             std::stringstream s;
             TEST_CHECK_EQUAL(run_command(Command("bash system_TEST_dir/captured_pipe_test.bash ONE TWO THREE")
-                        .with_pipe_command_handler("PALUDIS_PIPE_COMMAND", &response_handler)
+                        .with_pipe_command_handler("PALUDIS_PIPE_COMMAND", &response_handler, (FSEntry::cwd() / "system_TEST_dir"))
                         .with_captured_stdout_stream(&s)),
                     13);
             std::string line;

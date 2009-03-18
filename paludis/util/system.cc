@@ -175,6 +175,7 @@ namespace paludis
         bool prefix_blank_lines;
         std::string pipe_command_env_var_prefix;
         std::tr1::function<std::string (const std::string &)> pipe_command_handler;
+        FSEntry pipe_command_tmp_dir;
         std::ostream * captured_stdout_stream;
         std::ostream * captured_stderr_stream;
         std::istream * input_stream;
@@ -191,6 +192,7 @@ namespace paludis
                 const bool b = false, const bool bb = false,
                 const std::string & ep = "",
                 const std::tr1::function<std::string (const std::string &)> & h = std::tr1::function<std::string (const std::string &)>(),
+                const FSEntry & t = FSEntry("/var/empty"),
                 std::ostream * cs = 0,
                 std::ostream * ds = 0,
                 std::istream * is = 0,
@@ -210,6 +212,7 @@ namespace paludis
             prefix_blank_lines(bb),
             pipe_command_env_var_prefix(ep),
             pipe_command_handler(h),
+            pipe_command_tmp_dir(t),
             captured_stdout_stream(cs),
             captured_stderr_stream(ds),
             input_stream(is),
@@ -237,8 +240,9 @@ Command::Command(const Command & other) :
                 other._imp->uid, other._imp->gid, other._imp->stdout_prefix, other._imp->stderr_prefix,
                 other._imp->prefix_discard_blank_output,
                 other._imp->prefix_blank_lines, other._imp->pipe_command_env_var_prefix,
-                other._imp->pipe_command_handler, other._imp->captured_stdout_stream,
-                other._imp->captured_stderr_stream, other._imp->input_stream, other._imp->input_fd,
+                other._imp->pipe_command_handler, other._imp->pipe_command_tmp_dir,
+                other._imp->captured_stdout_stream, other._imp->captured_stderr_stream,
+                other._imp->input_stream, other._imp->input_fd,
                 other._imp->input_fd_env_var, other._imp->ptys))
 {
 }
@@ -258,6 +262,7 @@ Command::operator= (const Command & other)
                     other._imp->prefix_blank_lines,
                     other._imp->pipe_command_env_var_prefix,
                     other._imp->pipe_command_handler,
+                    other._imp->pipe_command_tmp_dir,
                     other._imp->captured_stdout_stream,
                     other._imp->captured_stderr_stream,
                     other._imp->input_stream,
@@ -642,6 +647,16 @@ paludis::run_command(const Command & cmd)
                             stringify(pipe_command_reader->write_fd()).c_str(), 1);
                     setenv((cmd.pipe_command_env_var_prefix() + "_READ_FD").c_str(),
                             stringify(pipe_command_response->read_fd()).c_str(), 1);
+#ifdef NEED_LOCKF_PIPE_HACK
+                    if (cmd.pipe_command_tmp_dir() != FSEntry("/var/empty"))
+                    {
+                        char * lock_fn = strdup(stringify(cmd.pipe_command_tmp_dir() / "paludis_pipe_command_lock_XXXXXX").c_str());
+                        int lock_fd = mkstemp(lock_fn);
+                        ::unlink(lock_fn);
+                        setenv((cmd.pipe_command_env_var_prefix() + "_LOCK_FD").c_str(),
+                                stringify(lock_fd).c_str(), 1);
+                    }
+#endif
                 }
 
                 if (cmd.captured_stdout_stream())
@@ -1269,6 +1284,19 @@ Command::with_pipe_command_handler(
 {
     _imp->pipe_command_env_var_prefix = p;
     _imp->pipe_command_handler = f;
+    _imp->pipe_command_tmp_dir = FSEntry("/var/empty");
+    return *this;
+}
+
+Command &
+Command::with_pipe_command_handler(
+        const std::string & p,
+        const std::tr1::function<std::string (const std::string &)> & f,
+        const FSEntry & t)
+{
+    _imp->pipe_command_env_var_prefix = p;
+    _imp->pipe_command_handler = f;
+    _imp->pipe_command_tmp_dir = t;
     return *this;
 }
 
@@ -1306,6 +1334,12 @@ const std::tr1::function<std::string (const std::string &)> &
 Command::pipe_command_handler() const
 {
     return _imp->pipe_command_handler;
+}
+
+const FSEntry
+Command::pipe_command_tmp_dir() const
+{
+    return _imp->pipe_command_tmp_dir;
 }
 
 std::ostream *

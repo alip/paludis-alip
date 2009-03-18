@@ -197,6 +197,17 @@ namespace paludis
                     const std::tr1::function<std::string (const std::string &)> &);
 
             /**
+             * Specify a pipe command handler.
+             *
+             * \param env_var_prefix has _READ_FD and _WRITE_FD appended to it.
+             *     \since 0.44, previously was always PALUDIS_PIPE_COMMAND.
+             */
+            Command & with_pipe_command_handler(
+                    const std::string & env_var_prefix,
+                    const std::tr1::function<std::string (const std::string &)> &,
+                    const FSEntry &);
+
+            /**
              * Specify a stream to which stdout is captured and written.
              */
             Command & with_captured_stdout_stream(std::ostream * const);
@@ -292,6 +303,17 @@ namespace paludis
              * \since 0.44
              */
             const std::string pipe_command_env_var_prefix() const;
+
+            /**
+             * A directory to use for temporary files with pipe
+             * commands.
+             *
+             * Needed because some platforms don't support locking
+             * pipes.
+             *
+             * \since 0.46
+             */
+            const FSEntry pipe_command_tmp_dir() const;
 
             /**
              * The captured stdout stream, or null.

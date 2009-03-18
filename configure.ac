@@ -156,6 +156,24 @@ AC_CHECK_DECLS([environ])
 AC_CHECK_FUNCS([clearenv])
 dnl }}}
 
+dnl {{{ check if a hack is needed because lockf can't lock pipes
+AC_MSG_CHECKING([whether lockf pipe hack is needed])
+AC_ARG_WITH([lockf-pipe-hack],
+	AS_HELP_STRING([--with-lockf-pipe-hack=@<:@yes|no@:>@],
+				   [Enable a hack to work around lockf not working on pipes (default: platform-dependent)]),
+	lockf_pipe_hack=`eval echo $withval`,
+	[case $host in
+		*linux*) lockf_pipe_hack=no ;;
+		*freebsd*) lockf_pipe_hack=yes ;;
+		*) AC_MSG_ERROR([Unknown \$host, please update configure.ac]) ;;
+	esac]
+)
+AC_MSG_RESULT([$lockf_pipe_hack])
+if test "x$lockf_pipe_hack" = "xyes"; then
+	AC_DEFINE([NEED_LOCKF_PIPE_HACK], [1], [Need to work around lame lockf])
+fi
+dnl }}}
+
 dnl {{{ check for listxattrf etc
 AC_MSG_CHECKING([for f*xattr function family])
 AC_COMPILE_IFELSE([

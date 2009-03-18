@@ -45,7 +45,7 @@ paludis_pipe_command()
 
     local r r1 rest a
     r="$(for a in "$@" ; do echo -n "${a}${PALUDIS_PIPE_COMMAND_DELIM:- }" ; done | {
-        if ! locked_pipe_command "${PALUDIS_PIPE_COMMAND_WRITE_FD}" "${PALUDIS_PIPE_COMMAND_READ_FD}" ; then
+        if ! locked_pipe_command "${PALUDIS_PIPE_COMMAND_WRITE_FD}" "${PALUDIS_PIPE_COMMAND_READ_FD}" ${PALUDIS_PIPE_COMMAND_LOCK_FD} ; then
             type die &>/dev/null && eval die "\"locked_pipe_command failed\""
             echo "locked_pipe_command failed" 1>&2
             if [[ -n ${EBUILD_KILL_PID} ]]; then
