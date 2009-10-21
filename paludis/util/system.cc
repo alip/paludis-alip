@@ -1061,7 +1061,7 @@ paludis::become_command(const Command & cmd)
     Log::get_instance()->message("util.system.execl_parent", ll_debug, lc_no_context) << "execl /bin/sh -c " << command
         << " " << extras;
 
-    /* The double fork with the ignoring CLD in the middle may or may not be
+    /* The double fork with the ignoring CHLD in the middle may or may not be
      * necessary, and it probably isn't, but POSIX appears to suggest that
      * doing this will guarantee that the feeding process won't be a zombie,
      * whereas it doesn't if we don't. Unless it doesn't. */
@@ -1103,12 +1103,12 @@ paludis::become_command(const Command & cmd)
             input_stream->clear_read_fd();
         }
 
-        /* Ignore CLD. POSIX may or may not say that if we do this, our child will
+        /* Ignore CHLD. POSIX may or may not say that if we do this, our child will
          * not become a zombie. */
         struct sigaction act;
         act.sa_handler = SIG_IGN;
         act.sa_flags = 0;
-        sigaction(SIGCLD, &act, 0);
+        sigaction(SIGCHLD, &act, 0);
 
         pid_t child_child(fork());
         if (0 == child_child)
