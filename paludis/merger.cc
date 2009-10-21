@@ -46,6 +46,11 @@
 #ifdef HAVE_XATTRS
 #  include <attr/xattr.h>
 #endif
+#ifndef HAVE_FUTIMENS
+#  ifdef HAVE_FUTIMES
+#    include <sys/time.h>
+#  endif
+#endif
 
 using namespace paludis;
 
@@ -828,10 +833,21 @@ Merger::install_file(const FSEntry & src, const FSEntry & dst_dir, const std::st
             if (timestamp < _imp->params.fix_mtimes_before())
                 timestamp = _imp->params.fix_mtimes_before();
 
+#ifdef HAVE_FUTIMENS
             struct timespec ts[2];
             ts[0] = ts[1] = timestamp.as_timespec();
             if (0 != ::futimens(output_fd, ts))
                 throw MergerError("Cannot futimens '" + stringify(dst) + "': " + stringify(::strerror(errno)));
+#else
+#  ifdef HAVE_FUTIMES
+            struct timeval tv[2];
+            tv[0] = tv[1] = timestamp.as_timeval();
+            if (0 != ::futimes(output_fd, tv))
+                throw MergerError("Cannot futimes '" + stringify(dst) + "': " + stringify(::strerror(errno)));
+#  else
+#    error "We need either futimens or futimes support"
+#  endif
+#endif
         }
 
         if (0 != std::rename(stringify(dst).c_str(), stringify(dst_real).c_str()))

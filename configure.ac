@@ -156,6 +156,11 @@ AC_CHECK_DECLS([environ])
 AC_CHECK_FUNCS([clearenv])
 dnl }}}
 
+dnl {{{ check for futimens or futimes function
+AC_CHECK_FUNCS([futimens],     [],
+	[AC_CHECK_FUNCS([futimes], [], [AC_MSG_ERROR([I need futimens or futimes])])])
+dnl }}}
+
 dnl {{{ check if a hack is needed because lockf can't lock pipes
 AC_MSG_CHECKING([whether lockf pipe hack is needed])
 AC_ARG_WITH([lockf-pipe-hack],
