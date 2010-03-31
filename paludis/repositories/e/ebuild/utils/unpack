@@ -47,8 +47,13 @@ unpack_tar.gz() {
 }
 
 unpack_tar.bz2() {
-    echo tar jxf "${1}" --no-same-owner "${TAR_OPTIONS[@]}" "${UNPACKONLY}" 1>&2
-    tar jxf "${1}" --no-same-owner "${TAR_OPTIONS[@]}" "${UNPACKONLY}"
+    if [[ -n "${UNPACKONLY}" ]]; then
+        echo tar jxf "${1}" --no-same-owner "${TAR_OPTIONS[@]}" "${UNPACKONLY}" 1>&2
+        tar jxf "${1}" --no-same-owner "${TAR_OPTIONS[@]}" "${UNPACKONLY}"
+    else
+        echo tar jxf "${1}" --no-same-owner "${TAR_OPTIONS[@]}"
+        tar jxf "${1}" --no-same-owner "${TAR_OPTIONS[@]}"
+    fi
 }
 
 unpack_zip() {
