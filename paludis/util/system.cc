@@ -1280,17 +1280,6 @@ Command::with_stderr_prefix(const std::string & s)
 Command &
 Command::with_pipe_command_handler(
         const std::string & p,
-        const std::tr1::function<std::string (const std::string &)> & f)
-{
-    _imp->pipe_command_env_var_prefix = p;
-    _imp->pipe_command_handler = f;
-    _imp->pipe_command_tmp_dir = FSEntry("/var/empty");
-    return *this;
-}
-
-Command &
-Command::with_pipe_command_handler(
-        const std::string & p,
         const std::tr1::function<std::string (const std::string &)> & f,
         const FSEntry & t)
 {

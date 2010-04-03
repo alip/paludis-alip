@@ -23,6 +23,7 @@
 #include <paludis/util/exception.hh>
 #include <paludis/util/private_implementation_pattern.hh>
 #include <paludis/util/wrapped_forward_iterator-fwd.hh>
+#include <paludis/util/fs_entry.hh>
 #include <tr1/memory>
 #include <tr1/functional>
 #include <string>
@@ -40,8 +41,6 @@
 
 namespace paludis
 {
-    class FSEntry;
-
     /**
      * Thrown if getenv_or_error fails.
      *
@@ -194,18 +193,8 @@ namespace paludis
              */
             Command & with_pipe_command_handler(
                     const std::string & env_var_prefix,
-                    const std::tr1::function<std::string (const std::string &)> &);
-
-            /**
-             * Specify a pipe command handler.
-             *
-             * \param env_var_prefix has _READ_FD and _WRITE_FD appended to it.
-             *     \since 0.44, previously was always PALUDIS_PIPE_COMMAND.
-             */
-            Command & with_pipe_command_handler(
-                    const std::string & env_var_prefix,
                     const std::tr1::function<std::string (const std::string &)> &,
-                    const FSEntry &);
+                    const FSEntry & t = FSEntry("/var/empty"));
 
             /**
              * Specify a stream to which stdout is captured and written.
