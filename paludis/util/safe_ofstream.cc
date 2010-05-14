@@ -62,12 +62,20 @@ namespace
     {
         Context context("When opening '" + stringify(e) + "' for write:");
 
-        if (-1 == open_flags)
-            open_flags = O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC;
+        if (-1 == open_flags) {
+            open_flags = O_CREAT | O_TRUNC | O_WRONLY;
+#ifdef O_CLOEXEC
+            open_flags |= O_CLOEXEC;
+#endif
+        }
 
         int result(open(stringify(e).c_str(), open_flags, 0644));
         if (-1 == result)
             throw SafeOFStreamError("Could not open '" + stringify(e) + "': " + strerror(errno));
+#ifndef O_CLOEXEC
+        if (-1 == fcntl(result, F_SETFD, FD_CLOEXEC))
+            throw SafeOFStreamError("Error setting cloexec for '" + stringify(e) + "': " + strerror(errno));
+#endif
 
         return result;
     }

@@ -100,9 +100,17 @@ namespace
     {
         Context context("When opening '" + stringify(e) + "' for read:");
 
-        int result(open(stringify(e).c_str(), O_RDONLY | O_CLOEXEC));
+        int open_flags = O_RDONLY;
+#ifdef O_CLOEXEC
+        open_flags |= O_CLOEXEC;
+#endif
+        int result(open(stringify(e).c_str(), open_flags));
         if (-1 == result)
             throw SafeIFStreamError("Could not open '" + stringify(e) + "': " + strerror(errno));
+#ifndef O_CLOEXEC
+        if (-1 == fcntl(result, F_SETFD, FD_CLOEXEC))
+            throw SafeIFStreamError("Error setting cloexec for '" + stringify(e) + "': " + strerror(errno));
+#endif
 
         struct stat sb;
         if (-1 == fstat(result, &sb)) {
