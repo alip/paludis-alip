@@ -525,7 +525,13 @@ FSEntry::ctim() const
         throw FSError("Filesystem entry '" + _imp->path + "' does not exist");
     }
 
+#if defined(HAVE_STRUCT_STAT_ST_CTIM)
     return Timestamp((*_imp->stat_info).st_ctim);
+#elif defined(HAVE_STRUCT_STAT_ST_CTIMESPEC)
+    return Timestamp((*_imp->stat_info).st_ctimespec);
+#else
+#error "don't know how to get sub-second timestamps"
+#endif
 }
 
 Timestamp
@@ -539,7 +545,13 @@ FSEntry::mtim() const
         throw FSError("Filesystem entry '" + _imp->path + "' does not exist");
     }
 
+#if defined(HAVE_STRUCT_STAT_ST_MTIM)
     return Timestamp((*_imp->stat_info).st_mtim);
+#elif defined(HAVE_STRUCT_STAT_ST_MTIMESPEC)
+    return Timestamp((*_imp->stat_info).st_mtimespec);
+#else
+#error "don't know how to get sub-second timestamps"
+#endif
 }
 
 off_t

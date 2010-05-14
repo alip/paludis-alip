@@ -228,6 +228,20 @@ if test "x$have_dirent_dtype" = "xyes"; then
 fi
 dnl }}}
 
+dnl {{{ check for stat's sub-second timestamps
+dnl Linux: st_ctim, st_mtim
+dnl FreeBSD: st_ctimespec, st_mtimespec if ! defined _POSIX_SOURCE
+dnl (TODO) FreeBSD: __st_ctimensec, __st_mtimensec if defined _POSIX_SOURCE
+AC_CHECK_MEMBERS([struct stat.st_ctim, struct stat.st_mtim], [],
+				 [AC_CHECK_MEMBERS([struct stat.st_ctimespec, struct stat.st_mtimespec],
+								   [],
+								   [AC_MSG_ERROR([don't know how to get sub-second timestamps])],
+								   [#include <sys/types.h>
+									#include <sys/stat.h>])],
+				 [#include <sys/types.h>
+				  #include <sys/stat.h>])
+dnl }}}
+
 dnl {{{ check for cxxflags
 if test x = x"$LET_ME_RICE"
 then
